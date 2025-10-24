@@ -1,0 +1,9 @@
+[submodule "user_service"]
+	path = user_service
+	url = https://github.com/SupDevOrg/user_service.git
+[submodule "notification_service"]
+	path = notification_service
+	url = https://github.com/SupDevOrg/notification_service.git
+[submodule "message_service"]
+	path = message_service
+	url = https://github.com/SupDevOrg/message_service.git
