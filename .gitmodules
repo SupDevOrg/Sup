@@ -1,9 +1,12 @@
 [submodule "user_service"]
 	path = user_service
 	url = https://github.com/SupDevOrg/user_service.git
+	branch = master
 [submodule "notification_service"]
 	path = notification_service
 	url = https://github.com/SupDevOrg/notification_service.git
+	branch = master
 [submodule "message_service"]
 	path = message_service
 	url = https://github.com/SupDevOrg/message_service.git
+    branch = master
