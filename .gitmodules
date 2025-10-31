@@ -9,7 +9,7 @@
 [submodule "message_service"]
 	path = message_service
 	url = https://github.com/SupDevOrg/message_service.git
-    branch = master
+    branch = dev
 [submodule "api_gateway"]
 	path = api_gateway
 	url = https://github.com/SupDevOrg/api_gateway.git
