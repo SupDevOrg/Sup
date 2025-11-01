@@ -14,6 +14,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1" ]
       interval: 10s
@@ -36,43 +38,61 @@ services:
     depends_on:
       user-service:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-#  message-service:
-#    container_name: message-service
-#    build:
-#      context: ./message_service
-#      dockerfile: Dockerfile
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=docker
-#      - JWT_SECRET=D4fN8Qr6Zu1WgX9Cv3PyL5Mk2Jh7Vt0s
-#    ports:
-#      - "8082:8080"
-#    networks:
-#      - app-network
-#    depends_on:
-#      - postgres
-#
-#  notification-service:
-#    container_name: notification-service
-#    build:
-#      context: ./notification_service
-#      dockerfile: Dockerfile
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=docker
-#      - JWT_SECRET=D4fN8Qr6Zu1WgX9Cv3PyL5Mk2Jh7Vt0s
-#    ports:
-#      - "8083:8080"
-#    networks:
-#      - app-network
-#    depends_on:
-#      - postgres
+  #  message-service:
+  #    container_name: message-service
+  #    build:
+  #      context: ./message_service
+  #      dockerfile: Dockerfile
+  #    environment:
+  #      - SPRING_PROFILES_ACTIVE=docker
+  #      - JWT_SECRET=D4fN8Qr6Zu1WgX9Cv3PyL5Mk2Jh7Vt0s
+  #    ports:
+  #      - "8082:8080"
+  #    networks:
+  #      - app-network
+  #    depends_on:
+  #      - postgres
+  #      - redis
+  #
+  #  notification-service:
+  #    container_name: notification-service
+  #    build:
+  #      context: ./notification_service
+  #      dockerfile: Dockerfile
+  #    environment:
+  #      - SPRING_PROFILES_ACTIVE=docker
+  #      - JWT_SECRET=D4fN8Qr6Zu1WgX9Cv3PyL5Mk2Jh7Vt0s
+  #    ports:
+  #      - "8083:8080"
+  #    networks:
+  #      - app-network
+  #    depends_on:
+  #      - postgres
+  #      - redis
 
+  redis:
+    container_name: redis
+    image: redis:7.2-alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   zookeeper:
     container_name: zookeeper
@@ -94,13 +114,13 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --list --bootstrap-server localhost:9092"]
+      test: ["CMD-SHELL", "kafka-topics.sh --list --bootstrap-server localhost:9092 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -120,9 +140,22 @@ services:
       - kafka
       - zookeeper
 
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "6060:8081"
+    networks:
+      - app-network
+    depends_on:
+      redis:
+        condition: service_healthy
+
   postgres:
     container_name: postgres
-    image: postgres:17.5
+    image: postgres:17.0-alpine
     ports:
       - "5432:5432"
     environment:
@@ -147,3 +180,4 @@ networks:
 volumes:
   postgres_data:
   kafka_data:
+  redis_data:
