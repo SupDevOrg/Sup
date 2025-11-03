@@ -48,6 +48,15 @@ services:
       retries: 3
       start_period: 40s
 
+#  email-service:
+#    container_name: email-service
+#    build:
+#      context: ./email_service
+#    networks:
+#      - app-network
+#    depends_on:
+#      - kafka
+
   #  message-service:
   #    container_name: message-service
   #    build:
