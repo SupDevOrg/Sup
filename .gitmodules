@@ -14,3 +14,7 @@
 	path = api_gateway
 	url = https://github.com/SupDevOrg/api_gateway.git
     branch = dev
+[submodule "email_service"]
+	path = email_service
+	url = https://github.com/SupDevOrg/email_service.git
+	branch = dev
