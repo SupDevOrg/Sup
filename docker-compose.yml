@@ -62,12 +62,17 @@ services:
       - DB_PASSWORD=admin123
       - DB_NAME=messageDB
       - DB_SSLMODE=disable
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_TOPIC=user-events
+      - KAFKA_GROUP_ID=message-service-group
     ports:
       - "8082:8080"
     networks:
       - app-network
     depends_on:
       postgres:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
 
   #  message-service:
