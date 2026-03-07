@@ -18,3 +18,7 @@
 	path = email_service
 	url = https://github.com/SupDevOrg/email_service.git
 	branch = dev
+[submodule "presences-service"]
+	path = presences-service
+	url = https://github.com/SupDevOrg/presences-service.git
+	branch = dev

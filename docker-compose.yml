@@ -75,22 +75,6 @@ services:
       kafka:
         condition: service_healthy
 
-  #  message-service:
-  #    container_name: message-service
-  #    build:
-  #      context: ./message_service
-  #      dockerfile: Dockerfile
-  #    environment:
-  #      - SPRING_PROFILES_ACTIVE=docker
-  #      - JWT_SECRET=D4fN8Qr6Zu1WgX9Cv3PyL5Mk2Jh7Vt0s
-  #    ports:
-  #      - "8082:8080"
-  #    networks:
-  #      - app-network
-  #    depends_on:
-  #      - postgres
-  #      - redis
-  #
   #  notification-service:
   #    container_name: notification-service
   #    build:
@@ -106,6 +90,23 @@ services:
   #    depends_on:
   #      - postgres
   #      - redis
+
+  presences-service:
+    container_name: presences-service
+    build:
+      context: ./presences-service
+      dockerfile: Dockerfile
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=D4fN8Qr6Zu1WgX9Cv3PyL5Mk2Jh7Vt0s
+      - RUST_LOG=info
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    depends_on:
+      redis:
+        condition: service_healthy
 
   redis:
     container_name: redis
